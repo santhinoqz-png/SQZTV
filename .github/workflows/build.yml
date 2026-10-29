@@ -19,8 +19,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 3. Preparar Gradle
+      - name: 3. Preparar Gradle 8.5 (compatible con el proyecto)
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
 
       - name: 4. Compilar el APK
         run: gradle assembleDebug --no-daemon
