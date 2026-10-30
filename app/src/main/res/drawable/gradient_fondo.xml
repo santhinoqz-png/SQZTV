@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo "salón de vidrio": degradado oscuro + auroras de color
+     que se ven a través de las tarjetas translúcidas -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base oscura -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#131318"
+                android:endColor="#08080B" />
+        </shape>
+    </item>
+
+    <!-- Aurora azul arriba a la derecha -->
+    <item
+        android:top="-320dp"
+        android:left="500dp"
+        android:bottom="400dp"
+        android:right="-180dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="600dp"
+                android:startColor="#334A9E4E"
+                android:centerColor="#22459CB0"
+                android:endColor="#00459CB0" />
+        </shape>
+    </item>
+
+    <!-- Aurora violeta abajo a la izquierda -->
+    <item
+        android:top="700dp"
+        android:left="-260dp"
+        android:bottom="-320dp"
+        android:right="700dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="640dp"
+                android:startColor="#2E6C4CD1"
+                android:centerColor="#1E6C4CD1"
+                android:endColor="#006C4CD1" />
+        </shape>
+    </item>
+
+    <!-- Toque cálido muy sutil arriba al centro -->
+    <item
+        android:top="-260dp"
+        android:left="60dp"
+        android:bottom="520dp"
+        android:right="160dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="480dp"
+                android:startColor="#1ED1845C"
+                android:centerColor="#10D1845C"
+                android:endColor="#00D1845C" />
+        </shape>
+    </item>
+</layer-list>
