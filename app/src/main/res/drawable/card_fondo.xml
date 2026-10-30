@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tarjeta "Liquid Glass": vidrio translúcido con borde luminoso.
+     Al enfocar, el vidrio se ilumina y brilla más. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ENFOCADA: vidrio brillante con borde luminoso -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="26dp" />
+                    <stroke android:width="1.5dp" android:color="#A6FFFFFF" />
+                    <solid android:color="#33FFFFFF" />
+                </shape>
+            </item>
+            <item android:top="1dp" android:bottom="1dp" android:left="1dp" android:right="1dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="25dp" />
+                    <gradient
+                        android:angle="90"
+                        android:startColor="#26FFFFFF"
+                        android:centerColor="#0DFFFFFF"
+                        android:endColor="#09FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- PRESIONADA: vidrio más denso -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="26dp" />
+                    <stroke android:width="1.5dp" android:color="#CCFFFFFF" />
+                    <solid android:color="#40FFFFFF" />
+                </shape>
+            </item>
+            <item android:top="1dp" android:bottom="1dp" android:left="1dp" android:right="1dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="25dp" />
+                    <gradient
+                        android:angle="90"
+                        android:startColor="#2EFFFFFF"
+                        android:centerColor="#12FFFFFF"
+                        android:endColor="#0CFFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- NORMAL: vidrio sutil translúcido con borde apenas lumínico -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="26dp" />
+                    <stroke android:width="1dp" android:color="#29FFFFFF" />
+                    <solid android:color="#1A1C1E" />
+                </shape>
+            </item>
+            <item android:top="1dp" android:bottom="1dp" android:left="1dp" android:right="1dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="25dp" />
+                    <gradient
+                        android:angle="90"
+                        android:startColor="#17FFFFFF"
+                        android:centerColor="#07FFFFFF"
+                        android:endColor="#04FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>
