@@ -13,9 +13,6 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.BaseAdapter
-import android.widget.GridView
 import android.widget.LinearLayout
 import android.widget.TextView
 import java.text.SimpleDateFormat
@@ -33,10 +30,20 @@ class MainActivity : Activity() {
             val ahora = Date()
             findViewById<TextView>(R.id.clock).text =
                 SimpleDateFormat("h:mm", Locale("es")).format(ahora)
+
+            val hora = SimpleDateFormat("H", Locale("es")).format(ahora).toIntOrNull() ?: 12
+            val saludo = when (hora) {
+                in 5..11 -> "☀️  Buenos días"
+                in 12..18 -> "🌤️  Buenas tardes"
+                else -> "🌙  Buenas noches"
+            }
+            findViewById<TextView>(R.id.saludo).text = saludo
+
             findViewById<TextView>(R.id.date).text =
                 SimpleDateFormat("EEEE, d 'de' MMMM", Locale("es"))
                     .format(ahora)
                     .replaceFirstChar { it.uppercase() }
+
             handler.postDelayed(this, 20_000L)
         }
     }
@@ -48,10 +55,9 @@ class MainActivity : Activity() {
 
         val todas = getInstalledApps()
 
-        // ─── FILA DE FAVORITOS (tarjetas grandes estilo Apple TV) ───
+        // ─── FILA DE FAVORITOS ───
         val favRow = findViewById<LinearLayout>(R.id.favRow)
         val favoritos = ArrayList<App>()
-
         for (palabra in FAVORITOS) {
             val encontrada = todas.firstOrNull { app ->
                 app.nombre.lowercase(Locale.getDefault()).contains(palabra) ||
@@ -61,13 +67,31 @@ class MainActivity : Activity() {
                 favoritos.add(encontrada)
             }
         }
-        // Ajustes siempre va al final de los favoritos
         favoritos.add(App("Ajustes", "settings", null))
         favoritos.forEach { favRow.addView(crearTarjeta(it, grande = true)) }
 
-        // ─── CUADRÍCULA CON TODAS LAS DEMÁS APPS ───
+        // ─── FILAS DE APPS (5 por fila, construidas igual que Favoritos) ───
         val resto = todas.filter { app -> favoritos.none { it.paquete == app.paquete } }
-        findViewById<GridView>(R.id.grid).adapter = AppAdapter(resto)
+        val contenedor = findViewById<LinearLayout>(R.id.gridContainer)
+
+        if (resto.isEmpty()) {
+            contenedor.addView(TextView(this).apply {
+                text = "No hay más apps instaladas por ahora"
+                textSize = 15f
+                setTextColor(0xFF8E8E93.toInt())
+                setPadding(0, dp(16), 0, 0)
+            })
+        } else {
+            resto.chunked(5).forEach { fila ->
+                val filaLayout = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                }
+                fila.forEach { app ->
+                    filaLayout.addView(crearTarjeta(app, grande = false))
+                }
+                contenedor.addView(filaLayout)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -76,7 +100,7 @@ class MainActivity : Activity() {
     }
 
     // Palabras clave para detectar tus favoritas (por nombre o paquete).
-    // ¿Quieres cambiar las favoritas? Edita esta lista y publique en GitHub.
+    // ¿Cambiar las favoritas? Edita esta lista.
     private companion object {
         val FAVORITOS = listOf(
             "xuper",
@@ -108,43 +132,37 @@ class MainActivity : Activity() {
             .sortedBy { it.nombre.lowercase(Locale.getDefault()) }
     }
 
-    private inner class AppAdapter(private val apps: List<App>) : BaseAdapter() {
-        override fun getCount(): Int = apps.size
-        override fun getItem(position: Int): App = apps[position]
-        override fun getItemId(position: Int): Long = position.toLong()
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
-            crearTarjeta(getItem(position), grande = false)
-    }
-
     private fun crearTarjeta(app: App, grande: Boolean): TextView {
         return TextView(this).apply {
             text = app.nombre
             gravity = Gravity.CENTER
             maxLines = 2
             ellipsize = TextUtils.TruncateAt.END
-            textSize = if (grande) 14f else 13f
-            setTextColor(0xFFE5E5EA.toInt())
+            textSize = if (grande) 15f else 13f
+            setTextColor(0xFFEDEDF2.toInt())
             typeface = Typeface.create("sans-serif", Typeface.NORMAL)
-            setPadding(dp(20), dp(28), dp(20), dp(20))
+            setPadding(dp(22), dp(30), dp(22), dp(22))
             background = resources.getDrawable(R.drawable.card_fondo, theme)
 
             app.icono?.let { icono ->
-                val tam = if (grande) dp(88) else dp(56)
+                val tam = if (grande) dp(92) else dp(64)
                 icono.setBounds(0, 0, tam, tam)
                 setCompoundDrawables(null, icono, null, null)
                 compoundDrawablePadding = dp(20)
             }
 
             layoutParams = if (grande) {
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { marginEnd = dp(20) }
+                LinearLayout.LayoutParams(dp(210), dp(250)).apply {
+                    marginEnd = dp(20)
+                }
             } else {
-                AbsListView.LayoutParams(dp(170), dp(200))
+                LinearLayout.LayoutParams(dp(190), dp(240)).apply {
+                    marginEnd = dp(18)
+                    bottomMargin = dp(18)
+                }
             }
-            minimumWidth = if (grande) dp(190) else dp(170)
-            minimumHeight = if (grande) dp(210) else dp(200)
+            minimumWidth = if (grande) dp(200) else dp(180)
+            minimumHeight = if (grande) dp(240) else dp(230)
 
             setOnFocusChangeListener { v, enfocado -> animarFoco(v, enfocado) }
             setOnClickListener { lanzar(app) }
