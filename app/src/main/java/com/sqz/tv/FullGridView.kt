@@ -14,4 +14,3 @@ class FullGridView(context: Context, attrs: AttributeSet) : GridView(context, at
         )
     }
 }
-
