@@ -1,39 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Pantalla principal estilo Apple TV: degradado oscuro elegante -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0B0F1A"
+    android:background="@drawable/gradient_fondo"
     android:fillViewport="true"
-    android:scrollbars="none">
+    android:scrollbars="none"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="56dp">
+        android:paddingLeft="64dp"
+        android:paddingTop="48dp"
+        android:paddingRight="64dp"
+        android:paddingBottom="48dp">
 
         <TextView
             android:id="@+id/clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="72sp"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-light"
+            android:textSize="96sp"
             android:textColor="#FFFFFF" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="48dp"
-            android:textSize="20sp"
-            android:textColor="#8FA3BF" />
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            android:textColor="#8E8E93" />
 
-        <LinearLayout
-            android:id="@+id/appsList"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:text="Favoritos"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF" />
+
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:scrollbars="none"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:id="@+id/favRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Todas las apps"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF" />
+
+        <com.sqz.tv.FullGridView
+            android:id="@+id/grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:numColumns="5"
+            android:horizontalSpacing="20dp"
+            android:verticalSpacing="20dp" />
 
     </LinearLayout>
 
