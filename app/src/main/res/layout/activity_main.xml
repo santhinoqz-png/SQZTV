@@ -1,71 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Pantalla estilo Apple TV / Liquid Glass.
-     Arriba: reloj + Favoritos (fijo). Abajo: cuadrícula de apps con scroll propio. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Pantalla SQZ TV estilo Apple TV / Liquid Glass:
+     panel de vidrio arriba con reloj + saludo,
+     fila de favoritos y filas de apps hechas a mano -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_fondo"
-    android:orientation="vertical"
-    android:paddingLeft="64dp"
-    android:paddingTop="40dp"
-    android:paddingRight="64dp"
-    android:paddingBottom="28dp">
+    android:fillViewport="true"
+    android:scrollbars="none"
+    android:overScrollMode="never">
 
-    <TextView
-        android:id="@+id/clock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:textSize="72sp"
-        android:textColor="#FFFFFF" />
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textSize="18sp"
-        android:textColor="#8E8E93" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="Favoritos"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF" />
-
-    <HorizontalScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:scrollbars="none"
-        android:overScrollMode="never">
+        android:orientation="vertical"
+        android:paddingLeft="56dp"
+        android:paddingTop="36dp"
+        android:paddingRight="56dp"
+        android:paddingBottom="40dp">
 
+        <!-- PANEL DE VIDRIO con reloj y saludo -->
         <LinearLayout
-            android:id="@+id/favRow"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" />
+            android:background="@drawable/glass_panel"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="48dp"
+            android:paddingTop="28dp"
+            android:paddingRight="48dp"
+            android:paddingBottom="28dp">
 
-    </HorizontalScrollView>
+            <TextView
+                android:id="@+id/clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textSize="76sp"
+                android:textColor="#FFFFFF" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="Todas las apps"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="44dp"
+                android:orientation="vertical">
 
-    <com.sqz.tv.FullGridView
-        android:id="@+id/grid"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="16dp"
-        android:numColumns="5"
-        android:horizontalSpacing="16dp"
-        android:verticalSpacing="16dp" />
+                <TextView
+                    android:id="@+id/saludo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textColor="#F2F2F7" />
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text
