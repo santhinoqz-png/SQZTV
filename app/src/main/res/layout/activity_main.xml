@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Pantalla SQZ TV estilo Apple TV / Liquid Glass:
-     panel de vidrio arriba con reloj + saludo,
-     fila de favoritos y filas de apps hechas a mano -->
+<!-- Pantalla SQZ TV estilo Apple claro:
+     panel con reloj + saludo, favoritos, pestañas de secciones
+     y apps en filas construidas por código -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,7 +19,7 @@
         android:paddingRight="56dp"
         android:paddingBottom="40dp">
 
-        <!-- PANEL DE VIDRIO con reloj y saludo -->
+        <!-- PANEL con reloj y saludo -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
                 android:textSize="76sp"
-                android:textColor="#FFFFFF" />
+                android:textColor="#1D1D1F" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
-                    android:textColor="#F2F2F7" />
+                    android:textColor="#48484D" />
 
                 <TextView
                     android:id="@+id/date"
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:textSize="18sp"
-                    android:textColor="#9A9EC0" />
+                    android:textColor="#86868B" />
 
             </LinearLayout>
         </LinearLayout>
@@ -70,7 +70,7 @@
             android:layout_marginLeft="8dp"
             android:text="Favoritos"
             android:textSize="20sp"
-            android:textColor="#FFFFFF" />
+            android:textColor="#6D6D72" />
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -88,16 +88,33 @@
 
         </HorizontalScrollView>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Pestañas de secciones -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:layout_marginLeft="8dp"
-            android:text="Todas las apps"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF" />
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
-        <!-- Las filas de apps se crean por código (igual que Favoritos) -->
+            <LinearLayout
+                android:id="@+id/tabsRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="6dp" />
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/tituloApps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="20sp"
+            android:textColor="#6D6D72" />
+
+        <!-- Las filas de apps se crean por código -->
         <LinearLayout
             android:id="@+id/gridContainer"
             android:layout_width="match_parent"
