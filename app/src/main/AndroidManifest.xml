@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Le dice al TV Box: "soy compatible con TV" -->
+    <!-- Permite ver todas las apps instaladas (necesario en Android 11+) -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+    <!-- Compatibilidad con TV -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
@@ -16,7 +19,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <!-- ¡EL TRUCO! ESTAS DOS LÍNEAS CONVIERTEN LA APP EN PANTALLA DE INICIO -->
+                <!-- Estas líneas convierten la app en pantalla de inicio -->
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
