@@ -1,127 +1,100 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Pantalla SQZ TV estilo Apple claro:
-     panel con reloj + saludo, favoritos, pestañas de secciones
-     y apps en filas construidas por código -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/gradient_fondo"
-    android:fillViewport="true"
-    android:scrollbars="none"
-    android:overScrollMode="never">
+package com.sqz.tv
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="56dp"
-        android:paddingTop="36dp"
-        android:paddingRight="56dp"
-        android:paddingBottom="40dp">
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.ResolveInfo
+import android.graphics.Typeface
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
+import android.text.TextUtils
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-        <!-- PANEL con reloj y saludo -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_panel"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="48dp"
-            android:paddingTop="28dp"
-            android:paddingRight="48dp"
-            android:paddingBottom="28dp">
+class MainActivity : Activity() {
 
-            <TextView
-                android:id="@+id/clock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:textSize="76sp"
-                android:textColor="#1D1D1F" />
+    private data class App(val nombre: String, val paquete: String, val icono: Drawable?)
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="44dp"
-                android:orientation="vertical">
+    private val handler = Handler(Looper.getMainLooper())
+    private var seccion = "Todas"
+    private var restoDeApps: List<App> = emptyList()
 
-                <TextView
-                    android:id="@+id/saludo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:textColor="#48484D" />
+    private val clockTick = object : Runnable {
+        override fun run() {
+            val ahora = Date()
+            findViewById<TextView>(R.id.clock).text =
+                SimpleDateFormat("h:mm", Locale("es")).format(ahora)
 
-                <TextView
-                    android:id="@+id/date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="18sp"
-                    android:textColor="#86868B" />
+            val hora = SimpleDateFormat("H", Locale("es")).format(ahora).toIntOrNull() ?: 12
+            val saludo = when (hora) {
+                in 5..11 -> "☀️  Buenos días"
+                in 12..18 -> "🌤️  Buenas tardes"
+                else -> "🌙  Buenas noches"
+            }
+            findViewById<TextView>(R.id.saludo).text = saludo
 
-            </LinearLayout>
-        </LinearLayout>
+            findViewById<TextView>(R.id.date).text =
+                SimpleDateFormat("EEEE, d 'de' MMMM", Locale("es"))
+                    .format(ahora)
+                    .replaceFirstChar { it.uppercase() }
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            android:layout_marginLeft="8dp"
-            android:text="Favoritos"
-            android:textSize="20sp"
-            android:textColor="#6D6D72" />
+            handler.postDelayed(this, 20_000L)
+        }
+    }
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:scrollbars="none"
-            android:overScrollMode="never">
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        handler.post(clockTick)
 
-            <LinearLayout
-                android:id="@+id/favRow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="6dp" />
+        val todas = getInstalledApps()
 
-        </HorizontalScrollView>
+        // ─── FILA DE FAVORITOS ───
+        val favRow = findViewById<LinearLayout>(R.id.favRow)
+        val favoritos = ArrayList<App>()
+        for (palabra in FAVORITOS) {
+            val encontrada = todas.firstOrNull { app ->
+                app.nombre.lowercase(Locale.getDefault()).contains(palabra) ||
+                    app.paquete.lowercase(Locale.getDefault()).contains(palabra)
+            }
+            if (encontrada != null && favoritos.none { it.paquete == encontrada.paquete }) {
+                favoritos.add(encontrada)
+            }
+        }
+        favoritos.add(App("Ajustes", "settings", null))
+        favoritos.forEach { favRow.addView(crearTarjeta(it, grande = true)) }
 
-        <!-- Pestañas de secciones -->
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:scrollbars="none"
-            android:overScrollMode="never">
+        // Apps restantes (las favoritas no se repiten en las secciones)
+        restoDeApps = todas.filter { app -> favoritos.none { it.paquete == app.paquete } }
 
-            <LinearLayout
-                android:id="@+id/tabsRow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="6dp" />
+        // ─── PESTAÑAS DE SECCIONES ───
+        val tabsRow = findViewById<LinearLayout>(R.id.tabsRow)
+        SECCIONES.forEach { tabsRow.addView(crearPestana(it)) }
+        pintarPestanas()
+        renderGrid()
+    }
 
-        </HorizontalScrollView>
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(clockTick)
+    }
 
-        <TextView
-            android:id="@+id/tituloApps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginLeft="8dp"
-            android:textSize="20sp"
-            android:textColor="#6D6D72" />
-
-        <!-- Las filas de apps se crean por código -->
-        <LinearLayout
-            android:id="@+id/gridContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:orientation="vertical" />
-
-    </LinearLayout>
-
-</ScrollView>
+    private companion object {
+        val FAVORITOS = listOf(
+            "xuper",
+            "youtube",
+            "play store",
+            "vending",
+            "apkpure",
+            "downloader",
+            "open browser",
+            "browser lite"
