@@ -70,7 +70,7 @@ class MainActivity : Activity() {
                 favoritos.add(encontrada)
             }
         }
-        favoritos.add(App("Ajustes", "settings", null))
+        favoritos.add(App("\u2699\uFE0F Ajustes", "settings", null))
         favoritos.forEach { favRow.addView(crearTarjeta(it, grande = true)) }
 
         // Apps restantes (las favoritas no se repiten en las secciones)
@@ -88,6 +88,8 @@ class MainActivity : Activity() {
         handler.removeCallbacks(clockTick)
     }
 
+    // Palabras clave para detectar tus favoritas (por nombre o paquete).
+    // ¿Cambiar las favoritas? Edita esta lista.
     private companion object {
         val FAVORITOS = listOf(
             "xuper",
@@ -114,7 +116,7 @@ class MainActivity : Activity() {
         val VIDEO = listOf(
             "youtube", "xuper", "netflix", "prime", "disney", "hbo", "max", "video",
             "v\u00eddeo", "cine", "movie", "pel\u00edcula", "iptv", "plex", "twitch",
-            "dazn", "paramount", "crackle", "pluto", "movistar", "claro"
+            "dazn", "paramount", "crackle", "pluto", "movistar", "claro", "tv"
         )
         val MUSICA = listOf("spotify", "music", "m\u00fasica", "audio", "radio", "podcast")
         val REDES = listOf(
@@ -124,7 +126,7 @@ class MainActivity : Activity() {
         val HERRAMIENTAS = listOf(
             "downloader", "browser", "chrome", "firefox", "file", "archivo",
             "explorador", "cleaner", "store", "apkpure", "vending", "install",
-            "instalad", "ajuste", "setting"
+            "instalad", "ajuste", "setting", "wifi"
         )
     }
 
@@ -132,12 +134,12 @@ class MainActivity : Activity() {
         val texto = (app.nombre + " " + app.paquete)
             .lowercase(Locale.getDefault())
         return when {
-            JUEGOS.any { texto.contains(it) } -> "Juegos"
-            VIDEO.any { texto.contains(it) } -> "TV y video"
-            MUSICA.any { texto.contains(it) } -> "M\u00fasica"
-            REDES.any { texto.contains(it) } -> "Redes"
-            HERRAMIENTAS.any { texto.contains(it) } -> "Herramientas"
-            else -> "Otros"
+            JUEGOS.any { texto.contains(it) } -> SECCIONES[1]
+            VIDEO.any { texto.contains(it) } -> SECCIONES[2]
+            MUSICA.any { texto.contains(it) } -> SECCIONES[3]
+            REDES.any { texto.contains(it) } -> SECCIONES[4]
+            HERRAMIENTAS.any { texto.contains(it) } -> SECCIONES[5]
+            else -> SECCIONES[6]
         }
     }
 
@@ -187,7 +189,7 @@ class MainActivity : Activity() {
         val contenedor = findViewById<LinearLayout>(R.id.gridContainer)
         contenedor.removeAllViews()
 
-        val lista = if (seccion == "Todas") {
+        val lista = if (seccion == SECCIONES[0]) {
             restoDeApps
         } else {
             restoDeApps.filter { categorizar(it) == seccion }
@@ -216,19 +218,43 @@ class MainActivity : Activity() {
 
     private fun getInstalledApps(): List<App> {
         val pm = packageManager
-        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val apps: MutableList<ResolveInfo> = pm.queryIntentActivities(intent, 0)
+        val mapa = java.util.LinkedHashMap<String, App>()
 
-        return apps
-            .filter { it.activityInfo.packageName != packageName }
-            .map { app ->
-                App(
-                    nombre = app.loadLabel(pm).toString(),
-                    paquete = app.activityInfo.packageName,
-                    icono = app.loadIcon(pm)
-                )
+        // Consulta por el modo "telefono" y por el modo "TV" (LEANBACK)
+        val listaIntents = listOf(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+        )
+        for (intent in listaIntents) {
+            pm.queryIntentActivities(intent, 0)
+                .filter { it.activityInfo.packageName != packageName }
+                .forEach { ri ->
+                    val paquete = ri.activityInfo.packageName
+                    if (!mapa.containsKey(paquete)) {
+                        mapa[paquete] = App(
+                            nombre = ri.loadLabel(pm).toString(),
+                            paquete = paquete,
+                            icono = ri.loadIcon(pm)
+                        )
+                    }
+                }
+        }
+
+        // Red de seguridad: cualquier app instalada con pantalla de inicio
+        for (info in pm.getInstalledApplications(0)) {
+            val paquete = info.packageName
+            if (paquete == packageName || mapa.containsKey(paquete)) continue
+            try {
+                val nombre = info.loadLabel(pm).toString()
+                if (nombre.isBlank()) continue
+                val icono = try { info.loadIcon(pm) } catch (e: Exception) { null }
+                mapa[paquete] = App(nombre, paquete, icono)
+            } catch (e: Exception) {
+                // app sin pantalla visible, se omite
             }
-            .distinctBy { it.paquete }
+        }
+
+        return mapa.values
             .sortedBy { it.nombre.lowercase(Locale.getDefault()) }
     }
 
@@ -270,6 +296,7 @@ class MainActivity : Activity() {
         }
     }
 
+    // Efecto Apple: la tarjeta enfocada crece suavemente y sube su sombra
     private fun animarFoco(v: View, enfocado: Boolean) {
         val escala = if (enfocado) 1.06f else 1f
         v.animate()
